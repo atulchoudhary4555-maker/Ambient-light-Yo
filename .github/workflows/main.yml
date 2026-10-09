@@ -3,57 +3,34 @@ name: Build Android APK
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
-
-    - name: set up JDK 17
+    - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
-        cache: gradle
-
-    - name: Complete Hard Reset and Force Rewrite Project Configuration
+    - name: Setup Gradle Build Environment
+      uses: gradle/actions/setup-gradle@v4
+    - name: Recreate Android Manifest
       run: |
-        rm -f fix.sh
-        
-        # 1. रिपोजिटरी के अंदर छिपे फोल्डर का पता लगाना
-        TARGET_DIR="Ambient-light-Yo/Ambient-light-Yo"
-        if [ ! -d "$TARGET_DIR" ]; then
-          TARGET_DIR="."
-        fi
-        echo "Target directory is: $TARGET_DIR"
-        
-        # 2. पुरानी सभी मैनिफेस्ट और कॉन्फिगरेशन फाइलों को साफ करना
-        find . -name "AndroidManifest.xml" -delete
-        find . -name "build.gradle" -delete
-        find . -name "settings.gradle" -delete
-        
-        # 3. सही फोल्डर स्ट्रक्चर तैयार करना
-        mkdir -p $TARGET_DIR/src/main
-        
-        # 4. बिल्कुल शुद्ध एंड्रॉइड मैनिफेस्ट लिखना
-        cat << 'EOF' > $TARGET_DIR/src/main/AndroidManifest.xml
+        mkdir -p src/main
+        cat << 'EOF' > src/main/AndroidManifest.xml
         <?xml version="1.0" encoding="utf-8"?>
-        <manifest xmlns:android="http://android.com">
+        <manifest xmlns:android="http://github.com">
             <uses-permission android:name="android.permission.INTERNET" />
             <application
                 android:theme="@android:style/Theme.DeviceDefault.NoActionBar"
                 android:label="Ambient Light for YouTube"
-                android:hardwareAccelerated="true"
-                android:allowBackup="false">
+                android:hardwareAccelerated="true">
                 <activity
                     android:name="com.shubham.ambientlight.MainActivity"
-                    android:exported="true"
-                    android:configChanges="orientation|screenSize|layoutDirection">
+                    android:exported="true">
                     <intent-filter>
                         <action android:name="android.intent.action.MAIN" />
                         <category android:name="android.intent.category.LAUNCHER" />
@@ -62,72 +39,9 @@ jobs:
             </application>
         </manifest>
         EOF
-
-        # 5. एक बिल्कुल नई और परफेक्ट build.gradle खुद तैयार करना (ताकि assemble टास्क मिले)
-        cat << 'EOF' > $TARGET_DIR/build.gradle
-        buildscript {
-            repositories {
-                google()
-                mavenCentral()
-            }
-            dependencies {
-                classpath 'com.android.tools.build:gradle:8.2.2'
-            }
-        }
-        
-        repositories {
-            google()
-            mavenCentral()
-        }
-        
-        apply plugin: 'com.android.application'
-        
-        android {
-            namespace 'com.shubham.ambientlight'
-            compileSdk 34
-            
-            defaultConfig {
-                applicationId "com.shubham.ambientlight"
-                minSdk 24
-                targetSdk 34
-                versionCode 1
-                versionName "1.0"
-            }
-            
-            compileOptions {
-                sourceCompatibility JavaVersion.VERSION_17
-                targetCompatibility JavaVersion.VERSION_17
-            }
-        }
-        
-        dependencies {
-            implementation 'androidx.appcompat:appcompat:1.6.1'
-            implementation 'androidx.core:core:1.12.0'
-            implementation 'com.google.android.material:material:1.11.0'
-        }
-        EOF
-
-        # 6. सही settings.gradle तैयार करना
-        cat << 'EOF' > $TARGET_DIR/settings.gradle
-        rootProject.name = "Ambient-light-Yo"
-        EOF
-        
-        echo "=== Ultimate Hard Reset Complete ==="
-
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v4
-
-    - name: Build with Global Gradle Direct
-      run: |
-        TARGET_DIR="Ambient-light-Yo/Ambient-light-Yo"
-        if [ ! -d "$TARGET_DIR" ]; then
-          TARGET_DIR="."
-        fi
-        cd $TARGET_DIR
-        # अब यह 100% assembleDebug टास्क ढूंढकर रन कर देगा
-        gradle assembleDebug
-        
-    - name: Upload APK
+    - name: Build APK Direct
+      run: gradle assembleDebug
+    - name: Upload APK Product
       uses: actions/upload-artifact@v4
       with:
         name: app-debug
