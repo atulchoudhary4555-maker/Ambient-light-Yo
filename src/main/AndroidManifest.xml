@@ -1,13 +1,25 @@
-<manifest xmlns:android="http://android.com">
+<manifest xmlns:android="http://android.com"
+    package="com.shubham.ambientlight">
+    
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <application android:theme="@android:style/Theme.DeviceDefault.NoActionBar" android:label="Ambient Light for YouTube" android:allowBackup="false">
-        <activity android:name=".MainActivity" android:exported="true">
+    
+    <application 
+        android:theme="@android:style/Theme.DeviceDefault.NoActionBar" 
+        android:label="Ambient Light for YouTube" 
+        android:allowBackup="false">
+        
+        <activity 
+            android:name=".MainActivity" 
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <service android:name=".AmbientService" android:exported="false"/>
+        
+        <service 
+            android:name=".AmbientService" 
+            android:exported="false"/>
     </application>
 </manifest>
