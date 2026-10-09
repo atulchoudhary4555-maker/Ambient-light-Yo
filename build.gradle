@@ -1,6 +1,15 @@
-plugins {
-    id 'com.android.application'
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        // यह लाइन गिटहब को एंड्रॉइड प्लगइन ढूंढने में मदद करेगी
+        classpath 'com.android.tools.build:gradle:8.2.2'
+    }
 }
+
+apply plugin: 'com.android.application'
 
 android {
     namespace 'com.shubham.ambientlight'
@@ -12,7 +21,6 @@ android {
         targetSdk 34
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -29,10 +37,7 @@ android {
 }
 
 dependencies {
-    // यही लाइन मिसिंग थी जिसकी वजह से एरर आ रही थी:
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.core:core:1.12.0'
-    
-    // मटेरियल डिज़ाइन लाइब्रेरी
     implementation 'com.google.android.material:material:1.11.0'
 }
