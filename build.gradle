@@ -1,15 +1,38 @@
 plugins {
-    id 'com.android.application' version '8.5.2'
+    id 'com.android.application'
 }
 
 android {
     namespace 'com.shubham.ambientlight'
-    compileSdk 35
+    compileSdk 34
+
     defaultConfig {
-        applicationId 'com.shubham.ambientlight'
-        minSdk 29
-        targetSdk 29
+        applicationId "com.shubham.ambientlight"
+        minSdk 24
+        targetSdk 34
         versionCode 1
-        versionName '1.0'
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    // यही लाइन मिसिंग थी जिसकी वजह से एरर आ रही थी:
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.core:core:1.12.0'
+    
+    // मटेरियल डिज़ाइन लाइब्रेरी
+    implementation 'com.google.android.material:material:1.11.0'
 }
