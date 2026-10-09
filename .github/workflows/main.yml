@@ -21,12 +21,12 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    - name: Absolute Hard Reset and Overwrite Manifest
+    - name: Absolute Hard Reset and Fix Configuration Files
       run: |
         rm -f fix.sh
-        rm -rf Ambient-light-Yo/Ambient-light-Yo/src/main/AndroidManifest.xml
-        rm -rf src/main/AndroidManifest.xml
         
+        # 1. सभी जगह गलत मैनिफेस्ट फाइलों को हटाकर फ्रेश बनाना
+        find . -name "AndroidManifest.xml" -delete
         mkdir -p Ambient-light-Yo/Ambient-light-Yo/src/main
         
         cat << 'EOF' > Ambient-light-Yo/Ambient-light-Yo/src/main/AndroidManifest.xml
@@ -51,12 +51,33 @@ jobs:
         </manifest>
         EOF
 
+        # 2. प्लगइन एरर को जड़ से खत्म करने के लिए settings.gradle को ऑटो-फिक्स करना
+        find . -name "settings.gradle" -delete
+        cat << 'EOF' > Ambient-light-Yo/Ambient-light-Yo/settings.gradle
+        pluginManagement {
+            repositories {
+                google()
+                mavenCentral()
+                gradlePluginPortal()
+            }
+        }
+        dependencyResolutionManagement {
+            repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+            repositories {
+                google()
+                mavenCentral()
+            }
+        }
+        rootProject.name = "Ambient-light-Yo"
+        EOF
+
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
 
     - name: Build with Global Gradle Direct
       run: |
-        # चूंकि gradlew फाइल नहीं है, हम सीधे ग्लोबल gradle का इस्तेमाल करेंगे
+        # अंदर वाले फोल्डर में घुसकर सीधे बिल्ड करना
+        cd Ambient-light-Yo/Ambient-light-Yo
         gradle clean assembleDebug
 
     - name: Upload APK
