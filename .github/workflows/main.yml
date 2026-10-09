@@ -21,16 +21,16 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    - name: Ultimate Clean and Overwrite AndroidManifest
+    - name: Force Overwrite Clean Manifest
       run: |
-        # 1. किसी भी पुराने या गलत स्क्रिप्ट को जड़ से डिलीट करना
-        rm -f fix.sh
-        find . -name "AndroidManifest.xml" -delete
+        # 1. गिटहब के पूरे पुराने फ़ोल्डर स्ट्रक्चर को पूरी तरह साफ़ करना
+        rm -rf src/main/AndroidManifest.xml
+        rm -rf app/src/main/AndroidManifest.xml
         
-        # 2. रूट डायरेक्टरी के हिसाब से नया फ़ोल्डर बनाना
+        # 2. ताज़ा फोल्डर बनाना
         mkdir -p src/main
         
-        # 3. बिना कीबोर्ड की गलती के सीधे शुद्धतम कोड लिखना
+        # 3. एक-एक लाइन को बिना किसी ऑटो-करेक्ट एरर के जबरन लिखना
         echo '<?xml version="1.0" encoding="utf-8"?>' > src/main/AndroidManifest.xml
         echo '<manifest xmlns:android="http://android.com">' >> src/main/AndroidManifest.xml
         echo '    <uses-permission android:name="android.permission.INTERNET" />' >> src/main/AndroidManifest.xml
@@ -51,17 +51,17 @@ jobs:
         echo '    </application>' >> src/main/AndroidManifest.xml
         echo '</manifest>' >> src/main/AndroidManifest.xml
         
-        echo "=== New Pure Manifest Written ==="
+        echo "=== Ultimate Fresh Manifest Output ==="
         cat src/main/AndroidManifest.xml
 
-    - name: Build with Gradle Direct
+    - name: Clean Gradle and Build Direct
       run: |
         GRADLEW_PATH=$(find . -name gradlew | head -n 1)
         if [ -z "$GRADLEW_PATH" ]; then
-          gradle assembleDebug
+          gradle clean assembleDebug
         else
           chmod +x "$GRADLEW_PATH"
-          ./gradlew assembleDebug
+          ./gradlew clean assembleDebug
         fi
 
     - name: Upload APK
