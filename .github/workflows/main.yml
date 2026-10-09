@@ -5,6 +5,8 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  # यही वो जादुई लाइन है जिससे "Run workflow" का बटन स्क्रीन पर आ जाएगा
+  workflow_dispatch:
 
 jobs:
   build:
@@ -23,7 +25,8 @@ jobs:
     - name: Automatically Create Correct AndroidManifest
       run: |
         mkdir -p src/main
-        echo '<?xml version="1.0" encoding="utf-8"?>
+        cat << 'EOF' > src/main/AndroidManifest.xml
+        <?xml version="1.0" encoding="utf-8"?>
         <manifest xmlns:android="http://android.com">
             <uses-permission android:name="android.permission.INTERNET" />
             <application
@@ -41,7 +44,8 @@ jobs:
                     </intent-filter>
                 </activity>
             </application>
-        </manifest>' > src/main/AndroidManifest.xml
+        </manifest>
+        EOF
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
