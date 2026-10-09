@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 1. यहाँ से package टैग को पूरी तरह हटा दिया गया है -->
 <manifest xmlns:android="http://android.com">
 
-    <!-- इंटरनेट इस्तेमाल करने की अनुमति -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -17,7 +15,6 @@
             android:configChanges="orientation|screenSize|layoutDirection">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <!-- 2. यहाँ मिसिंग android:name को ठीक कर दिया गया है -->
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -25,4 +22,3 @@
     </application>
 
 </manifest>
-            
