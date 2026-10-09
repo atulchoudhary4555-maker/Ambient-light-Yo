@@ -13,8 +13,13 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.override.onCreate(savedInstanceState);
+        // 1. सिंटैक्स एरर ठीक किया (super.override को super.onCreate किया)
+        super.onCreate(savedInstanceState);
+        
+        // नोट: अगर आपके पास activity_main.xml लेआउट है, तो आप नीचे वाली लाइन को अनकमेंट (Uncomment) कर सकते हैं
+        // setContentView(R.layout.activity_main);
 
+        // ओवरले परमिशन चेक करने का लॉजिक
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                     Uri.parse("package:" + getPackageName()));
@@ -31,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             startService(serviceIntent);
         }
-        finish();
+        finish(); // सर्विस स्टार्ट होने के बाद एक्टिविटी बंद करना
     }
 
     @Override
@@ -46,5 +51,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-            }
-  
+}
