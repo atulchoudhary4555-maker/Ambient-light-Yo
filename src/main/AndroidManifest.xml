@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://android.com">
+<manifest>
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission name="android.permission.INTERNET" />
 
     <application
-        android:theme="@android:style/Theme.DeviceDefault.NoActionBar"
-        android:label="Ambient Light for YouTube"
-        android:hardwareAccelerated="true"
-        android:allowBackup="false">
+        theme="@android:style/Theme.DeviceDefault.NoActionBar"
+        label="Ambient Light for YouTube"
+        hardwareAccelerated="true"
+        allowBackup="false">
 
         <activity
-            android:name="com.shubham.ambientlight.MainActivity"
-            android:exported="true"
-            android:configChanges="orientation|screenSize|layoutDirection">
+            name="com.shubham.ambientlight.MainActivity"
+            exported="true"
+            configChanges="orientation|screenSize|layoutDirection">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action name="android.intent.action.MAIN" />
+                <category name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
