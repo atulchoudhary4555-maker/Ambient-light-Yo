@@ -23,15 +23,12 @@ jobs:
 
     - name: Absolute Hard Reset and Overwrite Manifest
       run: |
-        # 1. गिटहब के छिपे हुए डबल फोल्डर के अंदर सीधे घुसना और खराब फाइल को डिलीट करना
         rm -f fix.sh
         rm -rf Ambient-light-Yo/Ambient-light-Yo/src/main/AndroidManifest.xml
         rm -rf src/main/AndroidManifest.xml
         
-        # 2. सही फोल्डर्स को नए सिरे से तैयार करना
         mkdir -p Ambient-light-Yo/Ambient-light-Yo/src/main
         
-        # 3. बिल्कुल शुद्ध कड़ियों के साथ फ्रेश फाइल लिखना
         cat << 'EOF' > Ambient-light-Yo/Ambient-light-Yo/src/main/AndroidManifest.xml
         <?xml version="1.0" encoding="utf-8"?>
         <manifest xmlns:android="http://android.com">
@@ -53,15 +50,14 @@ jobs:
             </application>
         </manifest>
         EOF
-        
-        echo "=== Absolute Overwrite Done ==="
 
-    - name: Build with Gradle Direct
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+
+    - name: Build with Global Gradle Direct
       run: |
-        GRADLEW_PATH=$(find . -name gradlew | head -n 1)
-        chmod +x "$GRADLEW_PATH"
-        cd $(dirname "$GRADLEW_PATH")
-        ./gradlew clean assembleDebug
+        # चूंकि gradlew फाइल नहीं है, हम सीधे ग्लोबल gradle का इस्तेमाल करेंगे
+        gradle clean assembleDebug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
