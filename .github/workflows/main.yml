@@ -23,13 +23,8 @@ jobs:
 
     - name: Create Fresh AndroidManifest in Main Directory
       run: |
-        # 1. पुरानी सभी मैनिफेस्ट फाइलों को पूरी तरह डिलीट करना
         find . -name "AndroidManifest.xml" -delete
-        
-        # 2. रूट डायरेक्टरी के हिसाब से सही फोल्डर स्ट्रक्चर बनाना
         mkdir -p src/main
-        
-        # 3. बिल्कुल सही जगह पर शुद्ध मैनिफेस्ट कोड लिखना
         cat << 'EOF' > src/main/AndroidManifest.xml
         <?xml version="1.0" encoding="utf-8"?>
         <manifest xmlns:android="http://android.com">
@@ -51,20 +46,14 @@ jobs:
             </application>
         </manifest>
         EOF
-        
-        echo "=== Manifest Created Successfully ==="
-        cat src/main/AndroidManifest.xml
 
-    - name: Build with Gradle (Smart Directory Search)
+    - name: Build with Gradle Direct
       run: |
         GRADLEW_PATH=$(find . -name gradlew | head -n 1)
         if [ -z "$GRADLEW_PATH" ]; then
-          echo "Gradle wrapper not found, building with global gradle..."
           gradle assembleDebug
         else
-          echo "Found gradlew at: $GRADLEW_PATH"
           chmod +x "$GRADLEW_PATH"
-          cd $(dirname "$GRADLEW_PATH")
           ./gradlew assembleDebug
         fi
 
