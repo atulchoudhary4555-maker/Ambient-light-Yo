@@ -21,37 +21,39 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    - name: Completely Overwrite and Force Correct Manifest
+    - name: Create Fresh AndroidManifest in Main Directory
       run: |
-        # 1. गिटहब के अंदर पुरानी सभी मैनिफेस्ट फाइलों को पूरी तरह डिलीट करना
+        # 1. पुरानी सभी मैनिफेस्ट फाइलों को पूरी तरह डिलीट करना
         find . -name "AndroidManifest.xml" -delete
         
-        # 2. नए सिरे से फ्रेश फोल्डर बनाना
-        mkdir -p app/src/main
+        # 2. रूट डायरेक्टरी के हिसाब से सही फोल्डर स्ट्रक्चर बनाना
+        mkdir -p src/main
         
-        # 3. बिल्कुल सही 'android:' नेमस्पेस के साथ शुद्ध मैनिफेस्ट कोड लिखना
-        echo '<?xml version="1.0" encoding="utf-8"?>' > app/src/main/AndroidManifest.xml
-        echo '<manifest xmlns:android="http://android.com">' >> app/src/main/AndroidManifest.xml
-        echo '    <uses-permission android:name="android.permission.INTERNET" />' >> app/src/main/AndroidManifest.xml
-        echo '    <application' >> app/src/main/AndroidManifest.xml
-        echo '        android:theme="@android:style/Theme.DeviceDefault.NoActionBar"' >> app/src/main/AndroidManifest.xml
-        echo '        android:label="Ambient Light for YouTube"' >> app/src/main/AndroidManifest.xml
-        echo '        android:hardwareAccelerated="true"' >> app/src/main/AndroidManifest.xml
-        echo '        android:allowBackup="false">' >> app/src/main/AndroidManifest.xml
-        echo '        <activity' >> app/src/main/AndroidManifest.xml
-        echo '            android:name="com.shubham.ambientlight.MainActivity"' >> app/src/main/AndroidManifest.xml
-        echo '            android:exported="true"' >> app/src/main/AndroidManifest.xml
-        echo '            android:configChanges="orientation|screenSize|layoutDirection">' >> app/src/main/AndroidManifest.xml
-        echo '            <intent-filter>' >> app/src/main/AndroidManifest.xml
-        echo '                <action android:name="android.intent.action.MAIN" />' >> app/src/main/AndroidManifest.xml
-        echo '                <category android:name="android.intent.category.LAUNCHER" />' >> app/src/main/AndroidManifest.xml
-        echo '            </intent-filter>' >> app/src/main/AndroidManifest.xml
-        echo '        </activity>' >> app/src/main/AndroidManifest.xml
-        echo '    </application>' >> app/src/main/AndroidManifest.xml
-        echo '</manifest>' >> app/src/main/AndroidManifest.xml
+        # 3. बिल्कुल सही जगह पर शुद्ध मैनिफेस्ट कोड लिखना
+        cat << 'EOF' > src/main/AndroidManifest.xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <manifest xmlns:android="http://android.com">
+            <uses-permission android:name="android.permission.INTERNET" />
+            <application
+                android:theme="@android:style/Theme.DeviceDefault.NoActionBar"
+                android:label="Ambient Light for YouTube"
+                android:hardwareAccelerated="true"
+                android:allowBackup="false">
+                <activity
+                    android:name="com.shubham.ambientlight.MainActivity"
+                    android:exported="true"
+                    android:configChanges="orientation|screenSize|layoutDirection">
+                    <intent-filter>
+                        <action android:name="android.intent.action.MAIN" />
+                        <category android:name="android.intent.category.LAUNCHER" />
+                    </intent-filter>
+                </activity>
+            </application>
+        </manifest>
+        EOF
         
-        echo "=== Created Fresh Manifest ==="
-        cat app/src/main/AndroidManifest.xml
+        echo "=== Manifest Created Successfully ==="
+        cat src/main/AndroidManifest.xml
 
     - name: Build with Gradle (Smart Directory Search)
       run: |
