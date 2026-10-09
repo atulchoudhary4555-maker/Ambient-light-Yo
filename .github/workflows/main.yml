@@ -21,18 +21,14 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    - name: Ultimate Deep Clean and Create Pure Manifest
+    - name: Nuclear Clean and Recreate Manifest Everywhere
       run: |
-        # 1. पूरे प्रोजेक्ट में जहां कहीं भी AndroidManifest.xml या fix.sh हो, उसे जड़ से मिटाना
-        find . -name "AndroidManifest.xml" -exec rm -f {} +
+        # 1. पूरे कंप्यूटर में किसी भी जगह मौजूद AndroidManifest.xml को जबरन डिलीट करना
+        find . -name "AndroidManifest.xml" -type f -delete
         rm -f fix.sh
         
-        # 2. सभी संभावित फोल्डर स्ट्रक्चर को एकदम फ्रेश बनाना
-        mkdir -p src/main
-        mkdir -p Ambient-light-Yo/src/main
-        
-        # 3. बिल्कुल सही 'android:' कड़ियों के साथ शुद्ध मैनिफेस्ट कोड तैयार करना
-        cat << 'EOF' > manifest_template.xml
+        # 2. शुद्ध मैनिफेस्ट टेम्पलेट तैयार करना
+        cat << 'EOF' > clean_manifest.xml
         <?xml version="1.0" encoding="utf-8"?>
         <manifest xmlns:android="http://android.com">
             <uses-permission android:name="android.permission.INTERNET" />
@@ -54,11 +50,13 @@ jobs:
         </manifest>
         EOF
         
-        # 4. दोनों जगहों पर फ्रेश फाइल को जबरन कॉपी करना
-        cp manifest_template.xml src/main/AndroidManifest.xml
-        cp manifest_template.xml Ambient-light-Yo/src/main/AndroidManifest.xml
-        
-        echo "=== Deep Clean Complete. Fresh Manifest Written Everywhere ==="
+        # 3. जहां-जहां src/main फ़ोल्डर मिल सकता है, उन सभी रास्तों पर इसे जबरन लिखना
+        for dir in $(find . -type d -name "main"); do
+          if [[ "$dir" == *"/src/main" ]]; then
+            echo "Writing pure manifest to: $dir"
+            cp clean_manifest.xml "$dir/AndroidManifest.xml"
+          fi
+        done
 
     - name: Build with Gradle Direct
       run: |
@@ -67,6 +65,7 @@ jobs:
           gradle clean assembleDebug
         else
           chmod +x "$GRADLEW_PATH"
+          cd $(dirname "$GRADLEW_PATH")
           ./gradlew clean assembleDebug
         fi
 
