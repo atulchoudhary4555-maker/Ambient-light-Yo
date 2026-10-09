@@ -1,38 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://android.com"
     package="com.shubham.ambientlight">
 
-    <!-- आवश्यक अनुमतियाँ (Permissions) -->
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <!-- इंटरनेट इस्तेमाल करने की अनुमति -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:theme="@android:style/Theme.DeviceDefault.NoActionBar"
         android:label="Ambient Light for YouTube"
+        android:hardwareAccelerated="true"
         android:allowBackup="false">
 
-        <!-- मुख्य एक्टिविटी -->
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:configChanges="orientation|screenSize|layoutDirection">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- बैकग्राउंड सर्विस (Android 14+ क्रैश प्रोटेक्शन के साथ) -->
-        <service
-            android:name=".AmbientService"
-            android:foregroundServiceType="specialUse"
-            android:exported="false">
-            
-            <!-- यह प्रॉपर्टी बहुत ज़रूरी है ताकि सिस्टम को पता चले कि ऐप क्या काम कर रही है -->
-            <property
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="Ambient lighting effect for media playback" />
-        </service>
 
     </application>
 
