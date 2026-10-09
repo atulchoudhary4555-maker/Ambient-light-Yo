@@ -76,9 +76,9 @@ jobs:
 
     - name: Build with Global Gradle Direct
       run: |
-        # अंदर वाले फोल्डर में घुसकर सीधे बिल्ड करना
+        # यहाँ से 'clean' हटा दिया है ताकि टास्क नॉट फाउंड का एरर न आए
         cd Ambient-light-Yo/Ambient-light-Yo
-        gradle clean assembleDebug
+        gradle assembleDebug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
