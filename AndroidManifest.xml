@@ -1,13 +1,36 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-<application android:theme="@android:style/Theme.NoTitleBar.Fullscreen" android:label="Ambient Light for YouTube" android:allowBackup="false">
-        <activity android:name=".MainActivity" android:exported="true">
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://android.com"
+    package="com.shubham.ambientlight">
+
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+
+    <application
+        android:theme="@android:style/Theme.DeviceDefault.NoActionBar"
+        android:label="Ambient Light for YouTube"
+        android:allowBackup="false">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".AmbientService" android:exported="false"/>
+
+        <service
+            android:name=".AmbientService"
+            android:foregroundServiceType="specialUse"
+            android:exported="false">
+            
+            <property 
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" 
+                android:value="explanation_for_ambient_light" />
+                
+        </service>
+
     </application>
+
 </manifest>
