@@ -10,19 +10,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
+        
     - name: Setup Gradle Build Environment
       uses: gradle/actions/setup-gradle@v4
-    - name: Recreate Android Manifest
+      
+    - name: Recreate Correct Android Configuration Everywhere
       run: |
-        mkdir -p src/main
-        cat << 'EOF' > src/main/AndroidManifest.xml
+        # 1. पुरानी सभी गलत मैनिफेस्ट फाइलों को हटाकर फ्रेश बनाना
+        find . -name "AndroidManifest.xml" -delete
+        mkdir -p Ambient-light-Yo/Ambient-light-Yo/src/main
+        
+        cat << 'EOF' > Ambient-light-Yo/Ambient-light-Yo/src/main/AndroidManifest.xml
         <?xml version="1.0" encoding="utf-8"?>
-        <manifest xmlns:android="http://github.com">
+        <manifest xmlns:android="http://android.com">
             <uses-permission android:name="android.permission.INTERNET" />
             <application
                 android:theme="@android:style/Theme.DeviceDefault.NoActionBar"
@@ -39,8 +45,57 @@ jobs:
             </application>
         </manifest>
         EOF
+
+        # 2. प्लगइन एरर को जड़ से खत्म करने के लिए build.gradle को जबरन रीराइट करना
+        cat << 'EOF' > Ambient-light-Yo/Ambient-light-Yo/build.gradle
+        buildscript {
+            repositories {
+                google()
+                mavenCentral()
+            }
+            dependencies {
+                classpath 'com.android.tools.build:gradle:8.2.2'
+            }
+        }
+        
+        repositories {
+            google()
+            mavenCentral()
+        }
+        
+        apply plugin: 'com.android.application'
+        
+        android {
+            namespace 'com.shubham.ambientlight'
+            compileSdk 34
+            
+            defaultConfig {
+                applicationId "com.shubham.ambientlight"
+                minSdk 24
+                targetSdk 34
+                versionCode 1
+                versionName "1.0"
+            }
+        }
+        
+        dependencies {
+            implementation 'androidx.appcompat:appcompat:1.6.1'
+            implementation 'com.google.android.material:material:1.11.0'
+        }
+        EOF
+
+        # 3. settings.gradle को फ्रेश करना
+        cat << 'EOF' > Ambient-light-Yo/Ambient-light-Yo/settings.gradle
+        rootProject.name = "Ambient-light-Yo"
+        EOF
+        
+        echo "=== Deep Configuration Fix Complete ==="
+
     - name: Build APK Direct
-      run: gradle assembleDebug
+      run: |
+        cd Ambient-light-Yo/Ambient-light-Yo
+        gradle assembleDebug
+        
     - name: Upload APK Product
       uses: actions/upload-artifact@v4
       with:
