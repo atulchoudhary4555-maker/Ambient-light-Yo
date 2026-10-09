@@ -26,7 +26,7 @@
             android:exported="false">
             
             <property 
-                **android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"** 
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" 
                 android:value="explanation_for_ambient_light" />
                 
         </service>
