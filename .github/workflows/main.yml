@@ -21,9 +21,12 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    - name: Automatically Create Correct AndroidManifest Everywhere
+    - name: Completely Clean and Recreate Correct AndroidManifest
       run: |
-        # मुख्य फोल्डर और सब-फोल्डर दोनों जगह मैनिफेस्ट बना रहे हैं ताकि कोई रिस्क न रहे
+        # पुरानी सभी गलत मैनिफेस्ट फाइलों को जड़ से डिलीट करना ताकि मर्जर एरर न आए
+        find . -name "AndroidManifest.xml" -delete
+        
+        # बिल्कुल सही फोल्डर स्ट्रक्चर तैयार करना
         mkdir -p src/main
         mkdir -p app/src/main
         
@@ -49,12 +52,12 @@ jobs:
         </manifest>
         EOF
         
+        # सिर्फ इन दो सही जगहों पर साफ कोड रखना
         cp manifest_template.xml src/main/AndroidManifest.xml
         cp manifest_template.xml app/src/main/AndroidManifest.xml
 
     - name: Build with Gradle (Smart Directory Search)
       run: |
-        # यह कमांड आपके प्रोजेक्ट के अंदरूनी gradlew को ऑटोमैटिकली ढूंढकर रन करेगी
         GRADLEW_PATH=$(find . -name gradlew | head -n 1)
         if [ -z "$GRADLEW_PATH" ]; then
           echo "Gradle wrapper not found, building with global gradle..."
