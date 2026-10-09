@@ -26,9 +26,12 @@ jobs:
         find . -name "AndroidManifest.xml" -delete
         mkdir -p Ambient-light-Yo/Ambient-light-Yo/src/main
         
-        cat << 'EOF' > Ambient-light-Yo/Ambient-light-Yo/src/main/AndroidManifest.xml
+        # ऑटो-करेक्ट से बचने के लिए एंड्रॉइड यूआरएल को टुकड़ों में लिखना
+        URL_SCHEMAS="http://android.com"
+        
+        cat << EOF > Ambient-light-Yo/Ambient-light-Yo/src/main/AndroidManifest.xml
         <?xml version="1.0" encoding="utf-8"?>
-        <manifest xmlns:android="http://android.com">
+        <manifest xmlns:android="${URL_SCHEMAS}">
             <uses-permission android:name="android.permission.INTERNET" />
             <application
                 android:theme="@android:style/Theme.DeviceDefault.NoActionBar"
