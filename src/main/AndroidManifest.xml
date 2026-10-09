@@ -3,6 +3,7 @@
     
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
     
     <application 
         android:theme="@android:style/Theme.DeviceDefault.NoActionBar" 
@@ -20,6 +21,7 @@
         
         <service 
             android:name=".AmbientService" 
+            android:foregroundServiceType="specialUse"
             android:exported="false"/>
     </application>
 </manifest>
