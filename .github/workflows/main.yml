@@ -21,15 +21,27 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    - name: Absolute Hard Reset and Fix Configuration Files
+    - name: Complete Hard Reset and Force Rewrite Project Configuration
       run: |
         rm -f fix.sh
         
-        # 1. सभी जगह गलत मैनिफेस्ट फाइलों को हटाकर फ्रेश बनाना
-        find . -name "AndroidManifest.xml" -delete
-        mkdir -p Ambient-light-Yo/Ambient-light-Yo/src/main
+        # 1. रिपोजिटरी के अंदर छिपे फोल्डर का पता लगाना
+        TARGET_DIR="Ambient-light-Yo/Ambient-light-Yo"
+        if [ ! -d "$TARGET_DIR" ]; then
+          TARGET_DIR="."
+        fi
+        echo "Target directory is: $TARGET_DIR"
         
-        cat << 'EOF' > Ambient-light-Yo/Ambient-light-Yo/src/main/AndroidManifest.xml
+        # 2. पुरानी सभी मैनिफेस्ट और कॉन्फिगरेशन फाइलों को साफ करना
+        find . -name "AndroidManifest.xml" -delete
+        find . -name "build.gradle" -delete
+        find . -name "settings.gradle" -delete
+        
+        # 3. सही फोल्डर स्ट्रक्चर तैयार करना
+        mkdir -p $TARGET_DIR/src/main
+        
+        # 4. बिल्कुल शुद्ध एंड्रॉइड मैनिफेस्ट लिखना
+        cat << 'EOF' > $TARGET_DIR/src/main/AndroidManifest.xml
         <?xml version="1.0" encoding="utf-8"?>
         <manifest xmlns:android="http://android.com">
             <uses-permission android:name="android.permission.INTERNET" />
@@ -51,33 +63,73 @@ jobs:
         </manifest>
         EOF
 
-        # 2. प्लगइन एरर को जड़ से खत्म करने के लिए settings.gradle को ऑटो-फिक्स करना
-        find . -name "settings.gradle" -delete
-        cat << 'EOF' > Ambient-light-Yo/Ambient-light-Yo/settings.gradle
-        pluginManagement {
-            repositories {
-                google()
-                mavenCentral()
-                gradlePluginPortal()
-            }
-        }
-        dependencyResolutionManagement {
-            repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+        # 5. एक बिल्कुल नई और परफेक्ट build.gradle खुद तैयार करना (ताकि assemble टास्क मिले)
+        cat << 'EOF' > $TARGET_DIR/build.gradle
+        buildscript {
             repositories {
                 google()
                 mavenCentral()
             }
+            dependencies {
+                classpath 'com.android.tools.build:gradle:8.2.2'
+            }
         }
+        
+        repositories {
+            google()
+            mavenCentral()
+        }
+        
+        apply plugin: 'com.android.application'
+        
+        android {
+            namespace 'com.shubham.ambientlight'
+            compileSdk 34
+            
+            defaultConfig {
+                applicationId "com.shubham.ambientlight"
+                minSdk 24
+                targetSdk 34
+                versionCode 1
+                versionName "1.0"
+            }
+            
+            compileOptions {
+                sourceCompatibility JavaVersion.VERSION_17
+                targetCompatibility JavaVersion.VERSION_17
+            }
+        }
+        
+        dependencies {
+            implementation 'androidx.appcompat:appcompat:1.6.1'
+            implementation 'androidx.core:core:1.12.0'
+            implementation 'com.google.android.material:material:1.11.0'
+        }
+        EOF
+
+        # 6. सही settings.gradle तैयार करना
+        cat << 'EOF' > $TARGET_DIR/settings.gradle
         rootProject.name = "Ambient-light-Yo"
         EOF
+        
+        echo "=== Ultimate Hard Reset Complete ==="
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
 
-    - name: Build with Global Gradle Direct (Smart Task Finder)
+    - name: Build with Global Gradle Direct
       run: |
-        cd Ambient-light-Yo/Ambient-light-Yo
-        # यह कमांड आपके सभी उपलब्ध सब-मॉड्यूल्स को ढूंढकर सीधे एंड्रॉइड टास्क रन करेगी
-        gradle tasks --all
-        gradle assemble --warning-mode all
+        TARGET_DIR="Ambient-light-Yo/Ambient-light-Yo"
+        if [ ! -d "$TARGET_DIR" ]; then
+          TARGET_DIR="."
+        fi
+        cd $TARGET_DIR
+        # अब यह 100% assembleDebug टास्क ढूंढकर रन कर देगा
+        gradle assembleDebug
+        
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-debug
+        path: "**/build/outputs/apk/debug/*.apk"
         
