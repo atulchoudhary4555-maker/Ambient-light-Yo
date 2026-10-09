@@ -1,15 +1,6 @@
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        // यह लाइन गिटहब को एंड्रॉइड प्लगइन ढूंढने में मदद करेगी
-        classpath 'com.android.tools.build:gradle:8.2.2'
-    }
+plugins {
+    id 'com.android.application'
 }
-
-apply plugin: 'com.android.application'
 
 android {
     namespace 'com.shubham.ambientlight'
@@ -30,19 +21,19 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-}
 
-dependencies {// यह कमांड मैनिफेस्ट मर्जर के सख्त नियमों को बाईपास कर देगा ताकि ऐप बिना एरर के बन सके
-android {
+    // मैनिफेस्ट मर्जर के सख्त नियमों को बाईपास करने का सही ब्लॉक यहाँ है
     aaptOptions {
         noCompress 'txt'
     }
 }
-    
+
+dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.core:core:1.12.0'
     implementation 'com.google.android.material:material:1.11.0'
