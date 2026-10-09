@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
+// यहाँ नाम बिल्कुल सही है और हमने हटा दिया है include ':app'
 rootProject.name = "Ambient-light-Yo"
-include ':app'
