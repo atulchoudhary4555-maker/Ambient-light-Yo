@@ -74,15 +74,10 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
 
-    - name: Build with Global Gradle Direct
+    - name: Build with Global Gradle Direct (Smart Task Finder)
       run: |
-        # यहाँ से 'clean' हटा दिया है ताकि टास्क नॉट फाउंड का एरर न आए
         cd Ambient-light-Yo/Ambient-light-Yo
-        gradle assembleDebug
-
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-debug
-        path: "**/build/outputs/apk/debug/*.apk"
+        # यह कमांड आपके सभी उपलब्ध सब-मॉड्यूल्स को ढूंढकर सीधे एंड्रॉइड टास्क रन करेगी
+        gradle tasks --all
+        gradle assemble --warning-mode all
         
