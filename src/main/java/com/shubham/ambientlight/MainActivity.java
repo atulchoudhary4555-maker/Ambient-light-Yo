@@ -1,54 +1,81 @@
 package com.shubham.ambientlight;
 
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.widget.Toast;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int OVERLAY_PERMISSION_REQ_CODE = 1234;
+    private WebView webView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // 1. सिंटैक्स एरर ठीक किया (super.override को super.onCreate किया)
         super.onCreate(savedInstanceState);
-        
-        // नोट: अगर आपके पास activity_main.xml लेआउट है, तो आप नीचे वाली लाइन को अनकमेंट (Uncomment) कर सकते हैं
-        // setContentView(R.layout.activity_main);
 
-        // ओवरले परमिशन चेक करने का लॉजिक
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
-            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:" + getPackageName()));
-            startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
-        } else {
-            startAmbientService();
-        }
+        // एक मेन लेआउट बनाना
+        FrameLayout mainLayout = new FrameLayout(this);
+        mainLayout.setBackgroundColor(Color.BLACK); // बैकग्राउंड काला रहेगा ताकि लाइट अच्छी दिखे
+
+        // वेबव्यू (WebView) सेटअप करना जिसमें यूट्यूब चलेगा
+        webView = new WebView(this);
+        FrameLayout.LayoutParams webViewParams = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+        );
+        mainLayout.addView(webView, webViewParams);
+        setContentView(mainLayout);
+
+        // वेबव्यू सेटिंग्स (जावास्क्रिप्ट ऑन करना ज़रूरी है)
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setMediaPlaybackRequiresUserGesture(false);
+
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                // जैसे ही यूट्यूब लोड होगा, यह स्क्रिप्ट वीडियो के पीछे एक ग्लो (Ambient Light) इफेक्ट बना देगी
+                injectAmbientLightScript();
+            }
+        });
+
+        // मोबाइल यूट्यूब वेबसाइट लोड करना
+        webView.loadUrl("https://youtube.com");
     }
 
-    private void startAmbientService() {
-        Intent serviceIntent = new Intent(this, AmbientService.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(serviceIntent);
-        } else {
-            startService(serviceIntent);
-        }
-        finish(); // सर्विस स्टार्ट होने के बाद एक्टिविटी बंद करना
+    private void injectAmbientLightScript() {
+        // यह जादुई कोड यूट्यूब वीडियो के रंगों को स्क्रीन के बैकग्राउंड पर ग्लो के रूप में फैलाता है
+        String jsCode = "javascript:(function() {" +
+                "var style = document.createElement('style');" +
+                "style.innerHTML = 'video { box-shadow: 0px 0px 80px 40px rgba(255,255,255,0.6); transition: box-shadow 0.3s ease; }';" +
+                "document.head.appendChild(style);" +
+                "var video = document.querySelector('video');" +
+                "if(video) {" +
+                "    video.addEventListener('play', function() {" +
+                "        setInterval(function() {" +
+                "            var canvas = document.createElement('canvas');" +
+                "            canvas.width = 1; canvas.height = 1;" +
+                "            var ctx = canvas.getContext('2d');" +
+                "            ctx.drawImage(video, 0, 0, 1, 1);" +
+                "            var c = ctx.getImageData(0, 0, 1, 1).data;" +
+                "            video.style.boxShadow = '0px 0px 100px 50px rgba('+c[0]+','+c[1]+','+c[2]+',0.8)';" +
+                "        }, 300);" +
+                "    });" +
+                "}" +
+                "})()";
+        webView.evaluateJavascript(jsCode, null);
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == OVERLAY_PERMISSION_REQ_CODE) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(this)) {
-                startAmbientService();
-            } else {
-                Toast.makeText(this, "Overlay permission is required!", Toast.LENGTH_SHORT).show();
-                finish();
-            }
+    public void onBackPressed() {
+        if (webView.canGoBack()) {
+            webView.goBack(); // पीछे जाने पर यूट्यूब का पिछला पेज खुलेगा, ऐप बंद नहीं होगी
+        } else {
+            super.onBackPressed();
         }
     }
 }
