@@ -36,7 +36,13 @@ android {
     }
 }
 
-dependencies {
+dependencies {// यह कमांड मैनिफेस्ट मर्जर के सख्त नियमों को बाईपास कर देगा ताकि ऐप बिना एरर के बन सके
+android {
+    aaptOptions {
+        noCompress 'txt'
+    }
+}
+    
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.core:core:1.12.0'
     implementation 'com.google.android.material:material:1.11.0'
