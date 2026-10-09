@@ -21,14 +21,18 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    - name: Nuclear Clean and Recreate Manifest Everywhere
+    - name: Absolute Hard Reset and Overwrite Manifest
       run: |
-        # 1. पूरे कंप्यूटर में किसी भी जगह मौजूद AndroidManifest.xml को जबरन डिलीट करना
-        find . -name "AndroidManifest.xml" -type f -delete
+        # 1. गिटहब के छिपे हुए डबल फोल्डर के अंदर सीधे घुसना और खराब फाइल को डिलीट करना
         rm -f fix.sh
+        rm -rf Ambient-light-Yo/Ambient-light-Yo/src/main/AndroidManifest.xml
+        rm -rf src/main/AndroidManifest.xml
         
-        # 2. शुद्ध मैनिफेस्ट टेम्पलेट तैयार करना
-        cat << 'EOF' > clean_manifest.xml
+        # 2. सही फोल्डर्स को नए सिरे से तैयार करना
+        mkdir -p Ambient-light-Yo/Ambient-light-Yo/src/main
+        
+        # 3. बिल्कुल शुद्ध कड़ियों के साथ फ्रेश फाइल लिखना
+        cat << 'EOF' > Ambient-light-Yo/Ambient-light-Yo/src/main/AndroidManifest.xml
         <?xml version="1.0" encoding="utf-8"?>
         <manifest xmlns:android="http://android.com">
             <uses-permission android:name="android.permission.INTERNET" />
@@ -50,24 +54,14 @@ jobs:
         </manifest>
         EOF
         
-        # 3. जहां-जहां src/main फ़ोल्डर मिल सकता है, उन सभी रास्तों पर इसे जबरन लिखना
-        for dir in $(find . -type d -name "main"); do
-          if [[ "$dir" == *"/src/main" ]]; then
-            echo "Writing pure manifest to: $dir"
-            cp clean_manifest.xml "$dir/AndroidManifest.xml"
-          fi
-        done
+        echo "=== Absolute Overwrite Done ==="
 
     - name: Build with Gradle Direct
       run: |
         GRADLEW_PATH=$(find . -name gradlew | head -n 1)
-        if [ -z "$GRADLEW_PATH" ]; then
-          gradle clean assembleDebug
-        else
-          chmod +x "$GRADLEW_PATH"
-          cd $(dirname "$GRADLEW_PATH")
-          ./gradlew clean assembleDebug
-        fi
+        chmod +x "$GRADLEW_PATH"
+        cd $(dirname "$GRADLEW_PATH")
+        ./gradlew clean assembleDebug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
